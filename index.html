@@ -12,45 +12,86 @@ body{
   background:#0f0f0f;
   color:#fff;
 }
+
+/* Header */
 header{
   padding:20px;
   font-size:24px;
   color:#d4af37;
   font-weight:bold;
 }
+
+/* Hero */
 .hero{
-  height:60vh;
+  height:50vh;
   background:url('https://images.unsplash.com/photo-1507089947367-19c1da9775ae') center/cover;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:36px;
+  font-size:28px;
+  text-align:center;
+  padding:20px;
 }
-.container{padding:20px;}
+
+/* Container */
+.container{
+  padding:20px;
+}
+
+/* Card */
 .card{
   background:#1a1a1a;
-  padding:15px;
-  margin:10px;
-  border-radius:10px;
+  padding:20px;
+  margin-bottom:20px;
+  border-radius:12px;
 }
+
+/* Button */
 button{
   background:#d4af37;
   border:none;
-  padding:10px;
-  cursor:pointer;
+  padding:12px;
+  margin-top:10px;
+  width:100%;
+  font-size:16px;
+  border-radius:6px;
 }
+
+/* Input */
 input{
-  padding:8px;
-  margin:5px;
+  width:100%;
+  padding:10px;
+  margin:5px 0;
+  border-radius:5px;
+  border:none;
 }
+
+/* Detail Page */
+#detail{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:#000;
+  overflow:auto;
+  padding:20px;
+}
+
+/* Chat */
 #chat{
   position:fixed;
-  right:20px;
-  bottom:100px;
+  right:10px;
+  bottom:90px;
   background:#222;
-  padding:10px;
+  padding:15px;
+  border-radius:10px;
   display:none;
+  width:250px;
 }
+
+/* Floating Buttons */
 #linBtn{
   position:fixed;
   bottom:20px;
@@ -58,7 +99,23 @@ input{
   background:#06c755;
   padding:15px;
   border-radius:50%;
-  cursor:pointer;
+}
+
+#agentBtn{
+  position:fixed;
+  bottom:90px;
+  right:20px;
+  background:#d4af37;
+  padding:12px;
+  border-radius:50%;
+}
+
+/* Mobile */
+@media(max-width:768px){
+  .hero{
+    font-size:20px;
+    height:40vh;
+  }
 }
 </style>
 </head>
@@ -68,64 +125,129 @@ input{
 <header>曜境 LandX</header>
 
 <div class="hero">
-  高端房地產 × AI × 3D 平台
+  高端房地產 × AI × 投資決策平台
 </div>
 
 <div class="container">
 
-<h2>房源列表</h2>
+<!-- 房源 -->
 <div class="card">
+  <h2>房源列表</h2>
   高雄豪宅 | 3000萬  
-  <br>
-  <button onclick="alert('進入物件頁')">查看</button>
+  <button onclick="openDetail()">查看</button>
 </div>
 
-<h2>刊登物件</h2>
-<input type="file" multiple id="imgUpload"><br>
-<input type="file" id="videoUpload"><br>
+<!-- 刊登 -->
+<div class="card">
+  <h2>刊登物件</h2>
+  圖片（最多12張）<br>
+  <input type="file" multiple id="imgUpload"><br>
+  影片（30MB）<br>
+  <input type="file" id="videoUpload"><br>
+</div>
 
-<h2>開發試算</h2>
-土地坪數 <input id="land"><br>
-容積率 <input id="rate"><br>
-<button onclick="calc()">試算</button>
-<div id="result"></div>
+<!-- 開發試算 -->
+<div class="card">
+  <h2>開發試算</h2>
+  土地坪數
+  <input id="land">
 
-<h2>貸款試算</h2>
-房價 <input id="price"><br>
-利率 <input id="interest"><br>
-<button onclick="loan()">計算</button>
-<div id="loanResult"></div>
+  容積率（例：240）
+  <input id="rate">
 
+  <button onclick="calc()">試算</button>
+
+  <div id="result"></div>
+</div>
+
+<!-- 貸款 -->
+<div class="card">
+  <h2>貸款試算</h2>
+  房價（萬）
+  <input id="price">
+
+  利率（例：2）
+  <input id="interest">
+
+  <button onclick="loan()">計算</button>
+
+  <div id="loanResult"></div>
+</div>
+
+</div>
+
+<!-- 物件頁 -->
+<div id="detail">
+  <h2>物件詳情</h2>
+  <p>高雄豪宅 - 景觀戶</p>
+  <button onclick="alert('預訂成功(示意)')">立即預訂</button>
+  <button onclick="closeDetail()">關閉</button>
 </div>
 
 <!-- 小嵐 -->
 <div id="linBtn" onclick="openChat()">💬</div>
 
 <div id="chat">
-小嵐：您好，我可以幫您找房或試算  
-<br>
-<button onclick="location.href='https://lin.ee/xxx'">LINE客服</button>
+小嵐：您好，我可以幫您找房、試算或推薦  
+<br><br>
+<button onclick="window.open('https://lin.ee/xxx')">LINE客服</button>
 </div>
 
+<!-- 阿榮 -->
+<div id="agentBtn" onclick="alert('聯繫阿榮')">👨</div>
+
 <script>
-function calc(){
-  let land=document.getElementById('land').value;
-  let rate=document.getElementById('rate').value;
-  let total = land * (rate / 100);
-  document.getElementById('result').innerHTML="可建坪："+total;
+
+// 物件頁
+function openDetail(){
+  document.getElementById('detail').style.display='block';
+}
+function closeDetail(){
+  document.getElementById('detail').style.display='none';
 }
 
+// 開發試算（修正）
+function calc(){
+  let land=parseFloat(document.getElementById('land').value)||0;
+  let rate=parseFloat(document.getElementById('rate').value)||0;
+
+  let total=land*(rate/100);
+
+  let result="可建坪："+total+"坪<br>";
+
+  if(total>1000){
+    result+="🔥 建議開發";
+  }else{
+    result+="⚠️ 利潤有限";
+  }
+
+  document.getElementById('result').innerHTML=result;
+}
+
+// 貸款試算（修正 NaN）
 function loan(){
-  let p=document.getElementById('price').value;
-  let i = parseFloat(interest) / 100 / 12;
+  let p=parseFloat(document.getElementById('price').value)||0;
+  let i=parseFloat(document.getElementById('interest').value)||0;
+
+  i=i/100/12;
   let m=240;
+
+  if(p===0 || i===0){
+    document.getElementById('loanResult').innerHTML="請輸入完整資料";
+    return;
+  }
+
   let pay=p*i/(1-Math.pow(1+i,-m));
+
   document.getElementById('loanResult').innerHTML="月付："+Math.round(pay);
 }
 
+// 小嵐聊天
 function openChat(){
-  document.getElementById('chat').style.display='block';
+  let chat=document.getElementById('chat');
+  chat.style.display=chat.style.display==='block'?'none':'block';
 }
+
 </script>
 
 </body>
