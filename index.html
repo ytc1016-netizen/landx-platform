@@ -6,118 +6,19 @@
 <title>曜境 LandX</title>
 
 <style>
-body{
-  margin:0;
-  font-family:Arial;
-  background:#0f0f0f;
-  color:#fff;
-  padding-bottom:90px;
-}
-
-header{
-  padding:20px;
-  font-size:22px;
-  color:#d4af37;
-}
-
+body{margin:0;font-family:Arial;background:#0f0f0f;color:#fff;}
+header{padding:15px;color:#d4af37;font-size:22px;}
 .container{padding:15px;}
+.card{background:#1a1a1a;padding:15px;margin-bottom:15px;border-radius:10px;}
+button{background:#d4af37;border:none;padding:10px;width:100%;margin-top:8px;border-radius:6px;}
+input,select{width:100%;padding:8px;margin:5px 0;border:none;border-radius:5px;}
 
-.card{
-  background:#1a1a1a;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
-}
+#viewer{width:100%;height:250px;object-fit:cover;}
+.preview{display:flex;overflow-x:auto;}
+.preview img{width:70px;height:50px;margin:5px;cursor:pointer;}
 
-button{
-  background:#d4af37;
-  border:none;
-  padding:10px;
-  width:100%;
-  border-radius:6px;
-  margin-top:8px;
-}
-
-input{
-  width:100%;
-  padding:10px;
-  margin:5px 0;
-  border-radius:5px;
-  border:none;
-}
-
-/* 物件頁 */
-#detail{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:#000;
-  overflow-y:auto;
-  padding:20px;
-}
-
-/* 關閉鍵 */
-.closeBtn{
-  position:fixed;
-  top:10px;
-  right:10px;
-  background:red;
-  padding:10px;
-  border-radius:50%;
-}
-
-/* 主圖 */
-#viewer{
-  width:100%;
-  max-height:300px;
-  object-fit:cover;
-  border-radius:10px;
-}
-
-/* 縮圖 */
-.preview{
-  display:flex;
-  overflow-x:auto;
-}
-.preview img{
-  width:80px;
-  height:60px;
-  margin:5px;
-  border-radius:5px;
-  cursor:pointer;
-  object-fit:cover;
-}
-
-/* 刪除鍵 */
-.delBtn{
-  position:absolute;
-  background:red;
-  color:#fff;
-  font-size:12px;
-  padding:2px 5px;
-  border-radius:5px;
-  cursor:pointer;
-}
-
-/* 客服 */
-#floatWrap{
-  position:fixed;
-  bottom:15px;
-  right:15px;
-}
-
-.float-btn{
-  width:50px;
-  height:50px;
-  border-radius:50%;
-  background:#06c755;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+#detail{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000;overflow:auto;padding:20px;}
+.closeBtn{position:fixed;top:10px;right:10px;background:red;padding:10px;border-radius:50%;}
 </style>
 </head>
 
@@ -128,162 +29,165 @@ input{
 <div class="container">
 
 <div class="card">
-高雄豪宅 | 3000萬  
-<button onclick="openDetail()">查看</button>
+<h3>📊 我的刊登額度</h3>
+<div id="quota"></div>
 </div>
 
 <div class="card">
-<h3>刊登</h3>
+<h3>刊登物件</h3>
 
-圖片（最多12張）
+<input id="title" placeholder="物件名稱">
+<input id="price" placeholder="價格">
+
 <input type="file" id="imgUpload" multiple>
 
-<div class="preview" id="imgPreview"></div>
+<button onclick="publish()">提交刊登</button>
+</div>
 
-影片（MP4 / MOV，30MB內）
-<input type="file" id="videoUpload">
+<div class="card">
+<h3>物件列表</h3>
+<div id="list"></div>
+</div>
 
+<div class="card">
+<h3>🎤 阿榮3D導覽</h3>
+<button onclick="playAgent()">▶ 播放</button>
+<p>🎬 即將開放專業版本</p>
+<button onclick="goLine()">預約體驗</button>
 </div>
 
 </div>
 
 <!-- 物件頁 -->
 <div id="detail">
-
 <div class="closeBtn" onclick="closeDetail()">✕</div>
-
-<h2>物件詳情</h2>
-
+<h2 id="d_title"></h2>
 <img id="viewer">
-
-<div class="preview" id="thumbs"></div>
-
-<video id="videoPreview" controls style="width:100%;margin-top:10px;"></video>
-
-<button onclick="goLine()">💬 LINE諮詢</button>
-<button onclick="callAgent()">📞 聯絡阿榮</button>
-
+<p id="d_price"></p>
 </div>
 
-<!-- 客服 -->
-<div id="floatWrap">
-<div class="float-btn" onclick="goLine()">💬</div>
+<!-- 登入 -->
+<div id="loginBox" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:#000a;">
+<div style="background:#1a1a1a;padding:20px;margin:50px;border-radius:10px;">
+<h3>註冊</h3>
+<input id="u_name" placeholder="姓名">
+<input id="u_phone" placeholder="手機">
+<button onclick="saveUser()">完成</button>
+</div>
 </div>
 
 <script>
 
-let images=[];
-let current=0;
+let FREE_QUOTA = 10;
 
-function showImage(index){
-  if(images.length===0) return;
-  current=index;
-  document.getElementById("viewer").src=images[current];
+// ===== 使用者 =====
+function getUser(){
+  return JSON.parse(localStorage.getItem("user"));
 }
 
-function renderThumbs(){
-  let box=document.getElementById("thumbs");
-  box.innerHTML="";
+function saveUser(){
+  let user={
+    name:u_name.value,
+    phone:u_phone.value,
+    quota:FREE_QUOTA
+  };
+  localStorage.setItem("user",JSON.stringify(user));
+  loginBox.style.display="none";
+  updateQuota();
+}
 
-  images.forEach((img,i)=>{
-    let el=document.createElement("img");
-    el.src=img;
-    el.onclick=()=>showImage(i);
-    box.appendChild(el);
+// ===== 額度 =====
+function updateQuota(){
+  let user=getUser();
+  if(!user) return;
+  quota.innerHTML="剩餘："+user.quota+" 筆";
+}
+
+// ===== 刊登 =====
+function publish(){
+
+  let user=getUser();
+
+  if(!user){
+    loginBox.style.display="block";
+    return;
+  }
+
+  if(user.quota<=0){
+    alert("已超過免費額度");
+    return;
+  }
+
+  let houses=JSON.parse(localStorage.getItem("houses"))||[];
+
+  let obj={
+    title:title.value,
+    price:price.value,
+    img:"",
+    expire:Date.now()+60*86400000
+  };
+
+  houses.push(obj);
+  localStorage.setItem("houses",JSON.stringify(houses));
+
+  user.quota--;
+  localStorage.setItem("user",JSON.stringify(user));
+
+  loadList();
+  updateQuota();
+
+  alert("刊登成功");
+}
+
+// ===== 列表 =====
+function loadList(){
+
+  let houses=JSON.parse(localStorage.getItem("houses"))||[];
+  list.innerHTML="";
+
+  let now=Date.now();
+
+  houses.forEach((h,i)=>{
+
+    if(h.expire<now) return;
+
+    let div=document.createElement("div");
+    div.innerHTML=`
+    ${h.title} | ${h.price}
+    <button onclick="view(${i})">查看</button>
+    `;
+    list.appendChild(div);
   });
 }
 
-// 圖片上傳
-document.getElementById('imgUpload').addEventListener('change',function(e){
+// ===== 查看 =====
+function view(i){
+  let houses=JSON.parse(localStorage.getItem("houses"));
+  let h=houses[i];
 
-  images=[];
-  let files=e.target.files;
+  d_title.innerText=h.title;
+  d_price.innerText=h.price;
 
-  if(files.length>12){
-    alert("最多12張");
-    return;
-  }
+  detail.style.display="block";
+}
 
-  let preview=document.getElementById("imgPreview");
-  preview.innerHTML="";
+function closeDetail(){
+  detail.style.display="none";
+}
 
-  for(let i=0;i<files.length;i++){
-    let reader=new FileReader();
+// ===== 阿榮 =====
+function playAgent(){
+  alert("阿榮：本案具增值潛力");
+}
 
-    reader.onload=function(ev){
-      images.push(ev.target.result);
-
-      let wrapper=document.createElement("div");
-      wrapper.style.position="relative";
-
-      let img=document.createElement("img");
-      img.src=ev.target.result;
-      img.style.width="80px";
-
-      let del=document.createElement("div");
-      del.innerText="X";
-      del.className="delBtn";
-
-      del.onclick=function(){
-        images.splice(i,1);
-        wrapper.remove();
-        renderThumbs();
-      }
-
-      wrapper.appendChild(img);
-      wrapper.appendChild(del);
-      preview.appendChild(wrapper);
-
-      if(images.length===1) showImage(0);
-      renderThumbs();
-    }
-
-    reader.readAsDataURL(files[i]);
-  }
-});
-
-// 影片
-document.getElementById('videoUpload').addEventListener('change',function(e){
-
-  let file=e.target.files[0];
-  if(!file) return;
-
-  let types=["video/mp4","video/quicktime"];
-
-  if(!types.includes(file.type)){
-    alert("僅支援 MP4 / MOV");
-    return;
-  }
-
-  if(file.size > 30*1024*1024){
-    alert("影片超過30MB");
-    return;
-  }
-
-  let url=URL.createObjectURL(file);
-  let v=document.getElementById('videoPreview');
-  v.src=url;
-  v.load();
-});
-
-// LINE
+// ===== LINE =====
 function goLine(){
   window.open('https://line.me/R/ti/p/@616sqpkz');
 }
 
-// 電話
-function callAgent(){
-  window.location.href="tel:0912345678";
-}
-
-// 物件頁
-function openDetail(){
-  document.getElementById('detail').style.display='block';
-}
-
-function closeDetail(){
-  document.getElementById('detail').style.display='none';
-}
+// ===== 初始化 =====
+updateQuota();
+loadList();
 
 </script>
 
