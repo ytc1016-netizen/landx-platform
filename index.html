@@ -1,1 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>曜境 LandX</title>
 
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0f0f0f;
+  color:#fff;
+}
+header{
+  padding:20px;
+  font-size:24px;
+  color:#d4af37;
+  font-weight:bold;
+}
+.hero{
+  height:60vh;
+  background:url('https://images.unsplash.com/photo-1507089947367-19c1da9775ae') center/cover;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:36px;
+}
+.container{padding:20px;}
+.card{
+  background:#1a1a1a;
+  padding:15px;
+  margin:10px;
+  border-radius:10px;
+}
+button{
+  background:#d4af37;
+  border:none;
+  padding:10px;
+  cursor:pointer;
+}
+input{
+  padding:8px;
+  margin:5px;
+}
+#chat{
+  position:fixed;
+  right:20px;
+  bottom:100px;
+  background:#222;
+  padding:10px;
+  display:none;
+}
+#linBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#06c755;
+  padding:15px;
+  border-radius:50%;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<header>曜境 LandX</header>
+
+<div class="hero">
+  高端房地產 × AI × 3D 平台
+</div>
+
+<div class="container">
+
+<h2>房源列表</h2>
+<div class="card">
+  高雄豪宅 | 3000萬  
+  <br>
+  <button onclick="alert('進入物件頁')">查看</button>
+</div>
+
+<h2>刊登物件</h2>
+<input type="file" multiple id="imgUpload"><br>
+<input type="file" id="videoUpload"><br>
+
+<h2>開發試算</h2>
+土地坪數 <input id="land"><br>
+容積率 <input id="rate"><br>
+<button onclick="calc()">試算</button>
+<div id="result"></div>
+
+<h2>貸款試算</h2>
+房價 <input id="price"><br>
+利率 <input id="interest"><br>
+<button onclick="loan()">計算</button>
+<div id="loanResult"></div>
+
+</div>
+
+<!-- 小嵐 -->
+<div id="linBtn" onclick="openChat()">💬</div>
+
+<div id="chat">
+小嵐：您好，我可以幫您找房或試算  
+<br>
+<button onclick="location.href='https://lin.ee/xxx'">LINE客服</button>
+</div>
+
+<script>
+function calc(){
+  let land=document.getElementById('land').value;
+  let rate=document.getElementById('rate').value;
+  let total=land*rate;
+  document.getElementById('result').innerHTML="可建坪："+total;
+}
+
+function loan(){
+  let p=document.getElementById('price').value;
+  let i=document.getElementById('interest').value/100/12;
+  let m=240;
+  let pay=p*i/(1-Math.pow(1+i,-m));
+  document.getElementById('loanResult').innerHTML="月付："+Math.round(pay);
+}
+
+function openChat(){
+  document.getElementById('chat').style.display='block';
+}
+</script>
+
+</body>
+</html>
