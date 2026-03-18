@@ -20,15 +20,6 @@ header{
   color:#d4af37;
 }
 
-.hero{
-  height:40vh;
-  background:url('https://images.unsplash.com/photo-1507089947367-19c1da9775ae') center/cover;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-}
-
 .container{padding:15px;}
 
 .card{
@@ -55,24 +46,43 @@ input{
   border:none;
 }
 
-/* 圖片預覽 */
-.preview img{
-  width:80px;
-  margin:5px;
-  border-radius:6px;
-}
-
-/* 影片 */
-video{
+/* 物件頁 */
+#detail{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
   width:100%;
-  margin-top:10px;
+  height:100%;
+  background:#000;
+  overflow:auto;
+  padding:20px;
 }
 
-/* 浮動 */
+/* 圖片 */
+#viewer{
+  width:100%;
+  border-radius:10px;
+}
+
+.navBtn{
+  width:48%;
+  display:inline-block;
+}
+
+/* 浮動客服 */
 #floatWrap{
   position:fixed;
   bottom:15px;
   right:15px;
+}
+
+#panel{
+  display:none;
+  background:#222;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:10px;
 }
 
 .float-btn{
@@ -82,16 +92,7 @@ video{
   display:flex;
   align-items:center;
   justify-content:center;
-  margin-top:10px;
-}
-
-#mainBtn{background:#06c755;}
-#panel{
-  display:none;
-  background:#222;
-  padding:10px;
-  border-radius:10px;
-  margin-bottom:10px;
+  background:#06c755;
 }
 </style>
 </head>
@@ -100,56 +101,56 @@ video{
 
 <header>曜境 LandX</header>
 
-<div class="hero">
-高端房地產 × 投資平台
-</div>
-
 <div class="container">
 
-<!-- 房源 -->
 <div class="card">
 高雄豪宅 | 3000萬  
-<button onclick="alert('物件頁展示')">查看</button>
+<button onclick="openDetail()">查看</button>
 </div>
 
-<!-- 刊登 -->
 <div class="card">
-<h3>刊登物件</h3>
-
-圖片（最多12張）
+<h3>刊登</h3>
 <input type="file" id="imgUpload" multiple>
-
-<div class="preview" id="imgPreview"></div>
-
-影片（30MB）
 <input type="file" id="videoUpload">
-
-<video id="videoPreview" controls></video>
-
 </div>
 
-<!-- 試算 -->
 <div class="card">
 <h3>開發試算</h3>
-
 土地坪數<input id="land">
 建蔽率<input id="build">
 容積率<input id="rate">
-
 <button onclick="calc()">試算</button>
-
 <div id="result"></div>
 </div>
+
+</div>
+
+<!-- 物件頁 -->
+<div id="detail">
+
+<h2>豪宅物件</h2>
+
+<img id="viewer">
+
+<button class="navBtn" onclick="prevImg()">上一張</button>
+<button class="navBtn" onclick="nextImg()">下一張</button>
+
+<video id="videoPreview" controls style="width:100%;margin-top:10px;"></video>
+
+<button onclick="goLine()">💬 LINE諮詢</button>
+<button onclick="callAgent()">📞 聯絡阿榮</button>
+
+<button onclick="closeDetail()">關閉</button>
 
 </div>
 
 <!-- 客服 -->
 <div id="floatWrap">
 <div id="panel">
-<button onclick="goLine()">LINE諮詢</button>
+<button onclick="goLine()">LINE客服</button>
 <button onclick="goLine()">專人帶看</button>
 </div>
-<div id="mainBtn" class="float-btn" onclick="togglePanel()">💬</div>
+<div class="float-btn" onclick="togglePanel()">💬</div>
 </div>
 
 <script>
@@ -159,57 +160,79 @@ function goLine(){
   window.open('https://line.me/R/ti/p/@616sqpkz');
 }
 
+// 電話（可改）
+function callAgent(){
+  window.location.href="tel:0912345678";
+}
+
 // 浮動
 function togglePanel(){
   let p=document.getElementById('panel');
   p.style.display=p.style.display==='block'?'none':'block';
 }
 
-// 圖片預覽
-document.getElementById('imgUpload').addEventListener('change', function(e){
-  let preview=document.getElementById('imgPreview');
-  preview.innerHTML='';
+// 物件頁
+function openDetail(){
+  document.getElementById('detail').style.display='block';
+}
+function closeDetail(){
+  document.getElementById('detail').style.display='none';
+}
 
+// 圖片輪播
+let images=[];
+let current=0;
+
+function showImage(){
+  if(images.length===0) return;
+  document.getElementById("viewer").src=images[current];
+}
+
+function nextImg(){
+  current=(current+1)%images.length;
+  showImage();
+}
+
+function prevImg(){
+  current=(current-1+images.length)%images.length;
+  showImage();
+}
+
+// 上傳圖片
+document.getElementById('imgUpload').addEventListener('change',function(e){
+  images=[];
   let files=e.target.files;
-
-  if(files.length>12){
-    alert("最多12張");
-    return;
-  }
 
   for(let i=0;i<files.length;i++){
     let reader=new FileReader();
     reader.onload=function(ev){
-      let img=document.createElement('img');
-      img.src=ev.target.result;
-      preview.appendChild(img);
+      images.push(ev.target.result);
+      if(images.length===1) showImage();
     }
     reader.readAsDataURL(files[i]);
   }
 });
 
-// 影片預覽
-document.getElementById('videoUpload').addEventListener('change', function(e){
+// 影片
+document.getElementById('videoUpload').addEventListener('change',function(e){
   let file=e.target.files[0];
-
-  if(file.size > 30*1024*1024){
-    alert("影片超過30MB");
-    return;
-  }
+  if(!file) return;
 
   let url=URL.createObjectURL(file);
-  document.getElementById('videoPreview').src=url;
+  let v=document.getElementById('videoPreview');
+
+  v.src=url;
+  v.load();
 });
 
 // 試算
 function calc(){
-
-  let land=parseFloat(document.getElementById('land').value)||0;
-  let build=parseFloat(document.getElementById('build').value)||0;
-  let rate=parseFloat(document.getElementById('rate').value)||0;
+  let land=parseFloat(land.value)||0;
+  let build=parseFloat(build.value)||0;
+  let rate=parseFloat(rate.value)||0;
 
   if(!land||!build||!rate){
-    document.getElementById('result').innerHTML="請輸入完整資料";
+    result.innerHTML="請輸入完整資料";
     return;
   }
 
@@ -220,13 +243,12 @@ function calc(){
   let total=land*rate;
   let floors=rate/build;
 
-  document.getElementById('result').innerHTML=`
-  建築占地：約 ${base.toFixed(1)} 坪<br>
-  總建坪：約 ${total.toFixed(1)} 坪<br>
-  預估樓層：約 ${floors.toFixed(1)} 層<br>
+  result.innerHTML=`
+  建築占地：${base.toFixed(1)} 坪<br>
+  總建坪：${total.toFixed(1)} 坪<br>
+  樓層：約 ${floors.toFixed(1)} 層<br>
   <hr>
-  🔍 想看完整分析？<br>
-  <button onclick="goLine()">LINE諮詢</button>
+  <button onclick="goLine()">LINE諮詢完整分析</button>
   `;
 }
 
