@@ -111,13 +111,13 @@ input{
 function calc(){
   let land=document.getElementById('land').value;
   let rate=document.getElementById('rate').value;
-  let total=land*rate;
+  let total = land * (rate / 100);
   document.getElementById('result').innerHTML="可建坪："+total;
 }
 
 function loan(){
   let p=document.getElementById('price').value;
-  let i=document.getElementById('interest').value/100/12;
+  let i = parseFloat(interest) / 100 / 12;
   let m=240;
   let pay=p*i/(1-Math.pow(1+i,-m));
   document.getElementById('loanResult').innerHTML="月付："+Math.round(pay);
