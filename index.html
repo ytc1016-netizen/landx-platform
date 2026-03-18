@@ -11,35 +11,26 @@ body{
   font-family:Arial;
   background:#0f0f0f;
   color:#fff;
-  padding-bottom:90px; /* 防擋底部 */
+  padding-bottom:90px;
 }
 
-/* Header */
 header{
   padding:20px;
   font-size:22px;
   color:#d4af37;
-  font-weight:bold;
 }
 
-/* Hero */
 .hero{
-  height:45vh;
+  height:40vh;
   background:url('https://images.unsplash.com/photo-1507089947367-19c1da9775ae') center/cover;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:22px;
   text-align:center;
-  padding:20px;
 }
 
-/* Container */
-.container{
-  padding:15px;
-}
+.container{padding:15px;}
 
-/* Card */
 .card{
   background:#1a1a1a;
   padding:15px;
@@ -47,7 +38,6 @@ header{
   border-radius:10px;
 }
 
-/* Button */
 button{
   background:#d4af37;
   border:none;
@@ -55,10 +45,8 @@ button{
   width:100%;
   border-radius:6px;
   margin-top:8px;
-  font-size:15px;
 }
 
-/* Input */
 input{
   width:100%;
   padding:10px;
@@ -67,25 +55,24 @@ input{
   border:none;
 }
 
-/* Detail */
-#detail{
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:#000;
-  overflow:auto;
-  padding:20px;
+/* 圖片預覽 */
+.preview img{
+  width:80px;
+  margin:5px;
+  border-radius:6px;
 }
 
-/* 浮動客服（核心） */
+/* 影片 */
+video{
+  width:100%;
+  margin-top:10px;
+}
+
+/* 浮動 */
 #floatWrap{
   position:fixed;
   bottom:15px;
   right:15px;
-  z-index:999;
 }
 
 .float-btn{
@@ -96,46 +83,15 @@ input{
   align-items:center;
   justify-content:center;
   margin-top:10px;
-  cursor:pointer;
-  font-size:18px;
 }
 
-/* 主按鈕（小嵐） */
-#mainBtn{
-  background:#06c755;
-}
-
-/* 阿榮 */
-#agentBtn{
-  background:#d4af37;
-}
-
-/* 展開面板 */
+#mainBtn{background:#06c755;}
 #panel{
   display:none;
   background:#222;
-  padding:12px;
+  padding:10px;
   border-radius:10px;
   margin-bottom:10px;
-  width:220px;
-}
-
-.panel-btn{
-  background:#333;
-  padding:8px;
-  margin:5px 0;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:14px;
-}
-
-/* Mobile */
-@media(max-width:768px){
-  .hero{font-size:18px;height:35vh;}
-  .float-btn{
-    width:45px;
-    height:45px;
-  }
 }
 </style>
 </head>
@@ -145,125 +101,133 @@ input{
 <header>曜境 LandX</header>
 
 <div class="hero">
-  高端房地產 × AI × 投資決策平台
+高端房地產 × 投資平台
 </div>
 
 <div class="container">
 
 <!-- 房源 -->
 <div class="card">
-  <h3>房源列表</h3>
-  高雄豪宅 | 3000萬  
-  <button onclick="openDetail()">查看</button>
+高雄豪宅 | 3000萬  
+<button onclick="alert('物件頁展示')">查看</button>
 </div>
 
 <!-- 刊登 -->
 <div class="card">
-  <h3>刊登物件</h3>
-  圖片（最多12張）
-  <input type="file" multiple>
-  影片（30MB）
-  <input type="file">
+<h3>刊登物件</h3>
+
+圖片（最多12張）
+<input type="file" id="imgUpload" multiple>
+
+<div class="preview" id="imgPreview"></div>
+
+影片（30MB）
+<input type="file" id="videoUpload">
+
+<video id="videoPreview" controls></video>
+
 </div>
 
-<!-- 開發試算 -->
+<!-- 試算 -->
 <div class="card">
-  <h3>開發試算</h3>
-  土地坪數
-  <input id="land">
-  容積率（例240）
-  <input id="rate">
-  <button onclick="calc()">試算</button>
-  <div id="result"></div>
-</div>
+<h3>開發試算</h3>
 
-<!-- 貸款 -->
-<div class="card">
-  <h3>貸款試算</h3>
-  房價（萬）
-  <input id="price">
-  利率（例2）
-  <input id="interest">
-  <button onclick="loan()">計算</button>
-  <div id="loanResult"></div>
+土地坪數<input id="land">
+建蔽率<input id="build">
+容積率<input id="rate">
+
+<button onclick="calc()">試算</button>
+
+<div id="result"></div>
 </div>
 
 </div>
 
-<!-- 物件頁 -->
-<div id="detail">
-  <h2>物件詳情</h2>
-  <p>高雄豪宅 - 景觀戶</p>
-  <button onclick="goLine()">💬 LINE諮詢</button>
-  <button onclick="closeDetail()">關閉</button>
-</div>
-
-<!-- 浮動客服 -->
+<!-- 客服 -->
 <div id="floatWrap">
-
-  <div id="panel">
-    <div class="panel-btn" onclick="goLine()">💬 LINE客服（小嵐）</div>
-    <div class="panel-btn" onclick="goLine()">👨 專人帶看（阿榮）</div>
-  </div>
-
-  <div id="mainBtn" class="float-btn" onclick="togglePanel()">💬</div>
+<div id="panel">
+<button onclick="goLine()">LINE諮詢</button>
+<button onclick="goLine()">專人帶看</button>
+</div>
+<div id="mainBtn" class="float-btn" onclick="togglePanel()">💬</div>
 </div>
 
 <script>
 
-// 你的LINE（小嵐主入口）
+// LINE
 function goLine(){
   window.open('https://line.me/R/ti/p/@616sqpkz');
 }
 
-// 面板開關（不擋畫面）
+// 浮動
 function togglePanel(){
   let p=document.getElementById('panel');
-  p.style.display = (p.style.display==='block')?'none':'block';
+  p.style.display=p.style.display==='block'?'none':'block';
 }
 
-// 物件頁
-function openDetail(){
-  document.getElementById('detail').style.display='block';
-}
-function closeDetail(){
-  document.getElementById('detail').style.display='none';
-}
+// 圖片預覽
+document.getElementById('imgUpload').addEventListener('change', function(e){
+  let preview=document.getElementById('imgPreview');
+  preview.innerHTML='';
 
-// 開發試算（修正）
-function calc(){
-  let land=parseFloat(document.getElementById('land').value)||0;
-  let rate=parseFloat(document.getElementById('rate').value)||0;
+  let files=e.target.files;
 
-  let total=land*(rate/100);
-
-  let text="可建坪："+total+"坪<br>";
-
-  if(total>1000){
-    text+="🔥 建議開發";
-  }else{
-    text+="⚠️ 利潤有限";
-  }
-
-  document.getElementById('result').innerHTML=text;
-}
-
-// 貸款試算
-function loan(){
-  let p=parseFloat(document.getElementById('price').value)||0;
-  let i=parseFloat(document.getElementById('interest').value)||0;
-
-  if(p===0||i===0){
-    document.getElementById('loanResult').innerHTML="請輸入完整資料";
+  if(files.length>12){
+    alert("最多12張");
     return;
   }
 
-  i=i/100/12;
-  let m=240;
+  for(let i=0;i<files.length;i++){
+    let reader=new FileReader();
+    reader.onload=function(ev){
+      let img=document.createElement('img');
+      img.src=ev.target.result;
+      preview.appendChild(img);
+    }
+    reader.readAsDataURL(files[i]);
+  }
+});
 
-  let pay=p*i/(1-Math.pow(1+i,-m));
+// 影片預覽
+document.getElementById('videoUpload').addEventListener('change', function(e){
+  let file=e.target.files[0];
 
-  document.getElementById('loanResult').innerHTML="月付："+Math.round(pay);
+  if(file.size > 30*1024*1024){
+    alert("影片超過30MB");
+    return;
+  }
+
+  let url=URL.createObjectURL(file);
+  document.getElementById('videoPreview').src=url;
+});
+
+// 試算
+function calc(){
+
+  let land=parseFloat(document.getElementById('land').value)||0;
+  let build=parseFloat(document.getElementById('build').value)||0;
+  let rate=parseFloat(document.getElementById('rate').value)||0;
+
+  if(!land||!build||!rate){
+    document.getElementById('result').innerHTML="請輸入完整資料";
+    return;
+  }
+
+  build/=100;
+  rate/=100;
+
+  let base=land*build;
+  let total=land*rate;
+  let floors=rate/build;
+
+  document.getElementById('result').innerHTML=`
+  建築占地：約 ${base.toFixed(1)} 坪<br>
+  總建坪：約 ${total.toFixed(1)} 坪<br>
+  預估樓層：約 ${floors.toFixed(1)} 層<br>
+  <hr>
+  🔍 想看完整分析？<br>
+  <button onclick="goLine()">LINE諮詢</button>
+  `;
 }
 
 </script>
