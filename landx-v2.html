@@ -80,8 +80,8 @@ body{
 
 // ===== 初始化 =====
 if(!localStorage.getItem("houses")){
-  let demo = [
-    {
+ let 1 = [
+  createHouse({
       id:1,
       title:"台中西屯｜3年翻倍潛力宅",
       price:980,
@@ -92,9 +92,9 @@ if(!localStorage.getItem("houses")){
       img:"img/house.jpg",
       viewCount:0,
       inquiryCount:0
-    },
-    {
+     }),
       id:2,
+ createHouse({
       title:"亞灣輕豪宅｜低總價入手",
       price:498,
       area:"高雄亞灣",
@@ -104,7 +104,7 @@ if(!localStorage.getItem("houses")){
       img:"img/house.jpg",
       viewCount:0,
       inquiryCount:0
-    }
+    })
   ]
   localStorage.setItem("houses",JSON.stringify(demo))
 }
