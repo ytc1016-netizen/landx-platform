@@ -13,76 +13,34 @@ body{
   max-width:500px;
   margin:auto;
 }
-
 .header{
   background:#111;
   color:#fff;
   padding:12px;
   text-align:center;
-  font-weight:bold;
 }
-
-.section{
-  padding:10px;
-}
-
-.section h2{
-  font-size:16px;
-  margin:5px 0;
-}
-
+.section{padding:10px;}
 .card{
   display:flex;
   background:#fff;
   border-radius:12px;
   margin-bottom:12px;
   overflow:hidden;
-  box-shadow:0 2px 10px rgba(0,0,0,0.08);
 }
-
 .card img{
   width:40%;
   height:120px;
   object-fit:cover;
 }
-
-.info{
-  padding:10px;
-  flex:1;
-}
-
-.info h3{
-  font-size:14px;
-  margin:0;
-}
-
-.info p{
-  font-size:12px;
-  margin:2px 0;
-}
-
+.info{padding:10px;}
 .btn{
   background:#007bff;
   color:#fff;
   border:none;
   padding:6px;
   border-radius:6px;
-  font-size:12px;
   width:100%;
-  margin-top:5px;
 }
-
-.badge{
-  position:absolute;
-  top:5px;
-  left:5px;
-  background:#ff3b30;
-  color:#fff;
-  font-size:10px;
-  padding:2px 6px;
-  border-radius:4px;
-}
-
 .line-btn{
   position:fixed;
   bottom:80px;
@@ -91,33 +49,22 @@ body{
   color:#fff;
   padding:12px;
   border-radius:50%;
-  font-size:20px;
 }
-
 .footer{
   position:fixed;
   bottom:0;
   width:100%;
   max-width:500px;
-  background:#fff;
   display:flex;
-  border-top:1px solid #ddd;
+  background:#fff;
 }
-
-.footer div{
-  flex:1;
-  text-align:center;
-  padding:10px;
-  font-size:12px;
-}
+.footer div{flex:1;text-align:center;padding:10px;}
 </style>
-
 </head>
 
 <body>
 
 <div class="header">🏠 LandX</div>
-
 <div id="app"></div>
 
 <div class="line-btn" onclick="goLineGlobal()">💬</div>
@@ -134,161 +81,87 @@ body{
 // ===== 初始化 =====
 if(!localStorage.getItem("houses")){
   let demo = [
-    createHouse({
+    {
+      id:1,
       title:"台中西屯｜3年翻倍潛力宅",
       price:980,
       area:"台中西屯",
       size:35,
       tag:"投資",
       highlight:"建地整合潛力",
-      img:"img/house.jpg"
-    }),
-    createHouse({
+      img:"img/house.jpg",
+      viewCount:0,
+      inquiryCount:0
+    },
+    {
+      id:2,
       title:"亞灣輕豪宅｜低總價入手",
       price:498,
       area:"高雄亞灣",
       size:28,
       tag:"降價",
       highlight:"近捷運",
-      img:"img/house.jpg"
-    })
+      img:"img/house.jpg",
+      viewCount:0,
+      inquiryCount:0
+    }
   ]
   localStorage.setItem("houses",JSON.stringify(demo))
 }
 
-function createHouse(data){
-  return {
-    id:Date.now()+Math.random(),
-    title:data.title,
-    price:data.price,
-    area:data.area,
-    size:data.size,
-    tag:data.tag,
-    highlight:data.highlight,
-    img:data.img,
-
-    createdAt:Date.now(),
-    expireAt:Date.now()+60*24*60*60*1000,
-
-    viewCount:0,
-    inquiryCount:0
-  }
-}
-
-// ===== 工具 =====
+// ===== 取得資料 =====
 function getList(){
   return JSON.parse(localStorage.getItem("houses"))||[]
-}
-
-function save(list){
-  localStorage.setItem("houses",JSON.stringify(list))
 }
 
 // ===== 行為 =====
 function addView(id){
   let list=getList()
   let h=list.find(x=>x.id===id)
-  if(h){h.viewCount++}
-  save(list)
+  if(h) h.viewCount++
+  localStorage.setItem("houses",JSON.stringify(list))
 }
 
-function addInquiry(id){
-  let list=getList()
-  let h=list.find(x=>x.id===id)
-  if(h){h.inquiryCount++}
-  save(list)
-}
-
-// ===== UI效果 =====
-function live(){ return Math.floor(Math.random()*5)+1 }
-
-function fake(){ 
-  let a=["🔥 昨天成交","🔥 3人詢問","🔥 熱門物件"]
-  return a[Math.floor(Math.random()*a.length)]
-}
-
-// ===== LINE =====
 function goLine(id){
-  addInquiry(id)
   let h=getList().find(x=>x.id===id)
-  let msg=`我對這個物件有興趣：${h.title} ${h.price}萬`
-  window.open("https://line.me/R/ti/p/?text="+encodeURIComponent(msg))
-}
-
-function goLineGlobal(){
   window.open("https://line.me/")
 }
-  // ===== 卡片（升級版） =====
-function card(h){
 
+// ===== 卡片 =====
+function card(h){
   addView(h.id)
 
-  return 
+  return `
   <div class="card">
-
-    <div style="position:relative">
-      <span class="badge">${h.tag || "精選"}</span>
-      <img src="${h.img || "https://via.placeholder.com/300x200"}">
-    </div>
-
+    <img src="${h.img}">
     <div class="info">
-      
-      <h3>🔥 ${h.title || "精選物件"}</h3>
-
-      <p style="font-size:16px;font-weight:bold;color:#e60000">
-        💰 ${h.price || 0}萬
-      </p>
-
-      <p style="color:#555">
-        📍 ${h.area || "台中"} ｜ ${h.size || "--"}坪
-      </p>
-
-      <p style="color:red">
-        ⚡ ${live()}人正在看
-      </p>
-
-      <p style="color:green">
-        💬 ${h.inquiryCount||0}人詢問
-      </p>
-
-      <p style="color:#ff6600">
-        📈 ${h.highlight || "投資推薦"}
-      </p>
-
-      <button class="btn" onclick="goLine(${h.id})">
-        💬 立即詢問（${live()}人搶）
-      </button>
-
+      <h3>${h.title}</h3>
+      <p>💰 ${h.price}萬</p>
+      <p>📍 ${h.area}｜${h.size}坪</p>
+      <button class="btn" onclick="goLine(${h.id})">立即詢問</button>
     </div>
   </div>
-  
+  `
 }
 
 // ===== 渲染 =====
 function render(){
-
   let list=getList()
 
-  let hot=[...list].sort((a,b)=>b.viewCount-a.viewCount).slice(0,5)
-  let newest=[...list].sort((a,b)=>b.createdAt-a.createdAt).slice(0,5)
+  let html = `
+    <div class="section">
+      ${list.map(card).join("")}
+    </div>
+  `
 
-  let html=`
-
-  <div class="section">
-    <h2>🔥 熱門物件</h2>
-    ${hot.map(card).join("")}
-  </div>
-
-  <div class="section">
-    <h2>🆕 最新上架</h2>
-    ${newest.map(card).join("")}
-  </div>
-.
-
-  document.getElementById("app").innerHTML=html
+  document.getElementById("app").innerHTML = html
 }
 
 render()
+
+function goLineGlobal(){
+  window.open("https://line.me/")
+}
 
 </script>
 
