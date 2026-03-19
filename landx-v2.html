@@ -131,15 +131,25 @@ function goLine(id){
 function card(h){
   addView(h.id)
 
+ function card(h){
+
+  addView(h.id)
+
   return `
   <div class="card">
+
     <img src="${h.img}">
+
     <div class="info">
       <h3>${h.title}</h3>
       <p>💰 ${h.price}萬</p>
-      <p>📍 ${h.area}｜${h.size}坪</p>
-      <button class="btn" onclick="goLine(${h.id})">立即詢問</button>
+      <p>📍 ${h.area} ｜ ${h.size}坪</p>
+
+      <button class="btn" onclick="goLine(${h.id})">
+        立即詢問
+      </button>
     </div>
+
   </div>
   `
 }
