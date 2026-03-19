@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LandX V2</title>
+
+<style>
+body{font-family:sans-serif;background:#f5f5f5;margin:0}
+.header{padding:15px;background:#111;color:#fff;text-align:center}
+.container{padding:10px}
+
+.card{
+  background:#fff;
+  margin-bottom:12px;
+  border-radius:10px;
+  overflow:hidden;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card img{width:100%;height:180px;object-fit:cover}
+
+.card-content{padding:10px}
+
+button{
+  width:100%;
+  padding:10px;
+  margin-top:5px;
+  border:none;
+  border-radius:6px;
+  background:#007bff;
+  color:#fff;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">🏠 LandX V2（成交強化）</div>
+
+<div class="container" id="list"></div>
+
+<script>
+
+// ======================
+// 初始化資料（若沒有）
+// ======================
+if(!localStorage.getItem("houses")){
+  let demo = [
+    createHouse({title:"台中高投報套房",price:688,img:"https://picsum.photos/400/300?1"}),
+    createHouse({title:"台北精華區小宅",price:1280,img:"https://picsum.photos/400/300?2"}),
+    createHouse({title:"高雄低總價投資宅",price:498,img:"https://picsum.photos/400/300?3"})
+  ]
+  localStorage.setItem("houses",JSON.stringify(demo))
+}
+
+// ======================
+// 建立物件
+// ======================
+function createHouse(data){
+  return {
+    id: Date.now()+Math.random(),
+    title:data.title,
+    price:data.price,
+    img:data.img,
+
+    createdAt:Date.now(),
+    expireAt:Date.now()+60*24*60*60*1000,
+
+    viewCount:0,
+    clickCount:0,
+    inquiryCount:0,
+
+    isTop:false,
+    boostScore:0
+  }
+}
+
+// ======================
+// 行為數據
+// ======================
+function addView(id){
+  let list = getList()
+  let h = list.find(x=>x.id===id)
+  if(h){h.viewCount++}
+  save(list)
+}
+
+function addClick(id){
+  let list = getList()
+  let h = list.find(x=>x.id===id)
+  if(h){h.clickCount++}
+  save(list)
+}
+
+function addInquiry(id){
+  let list = getList()
+  let h = list.find(x=>x.id===id)
+  if(h){h.inquiryCount++}
+  save(list)
+}
+
+// ======================
+// 排名演算法
+// ======================
+function getScore(h){
+  let score = 0
+  score += h.viewCount * 1
+  score += h.clickCount * 3
+  score += h.inquiryCount * 5
+  if(h.isTop) score += 1000
+
+  let days = (Date.now()-h.createdAt)/(1000*60*60*24)
+  score -= days*2
+
+  return score
+}
+
+// ======================
+// V2 強化
+// ======================
+function getLiveView(){
+  return Math.floor(Math.random()*5)+1
+}
+
+function getFakeDeal(){
+  let arr=[
+    "🔥 今天已有1人預約",
+    "🔥 昨天成交",
+    "🔥 近7天3人詢問"
+  ]
+  return arr[Math.floor(Math.random()*arr.length)]
+}
+
+function aiTag(h){
+  if(h.price < 800) return "💰 高CP值"
+  if(h.viewCount > 20) return "🔥 熱門"
+  return "⭐ AI推薦"
+}
+
+function getCountdown(h){
+  let d = Math.floor((h.expireAt-Date.now())/(1000*60*60*24))
+  return d
+}
+
+// ======================
+// LINE
+// ======================
+function goLine(id){
+  addInquiry(id)
+
+  let h = getList().find(x=>x.id===id)
+
+  let msg = `🔥 精選推薦
+${h.title}
+💰 ${h.price}萬
+👉 我有興趣`
+
+  window.open("https://line.me/R/ti/p/?text="+encodeURIComponent(msg))
+}
+
+// ======================
+// 收費（示意）
+// ======================
+function buyTop(id){
+  alert("👉 加LINE付款開通置頂（限時$29）")
+}
+
+// ======================
+// 工具
+// ======================
+function getList(){
+  return JSON.parse(localStorage.getItem("houses")) || []
+}
+
+function save(list){
+  localStorage.setItem("houses",JSON.stringify(list))
+}
+
+// ======================
+// 渲染
+// ======================
+function render(){
+
+  let list = getList()
+
+  // 排序
+  list.sort((a,b)=>getScore(b)-getScore(a))
+
+  let html=""
+
+  list.forEach(h=>{
+
+    addView(h.id)
+
+    html += `
+    <div class="card" onclick="addClick(${h.id})">
+      <img src="${h.img}">
+
+      <div class="card-content">
+
+        <h3>${h.title}</h3>
+        <p>💰 ${h.price} 萬</p>
+
+        <p>${aiTag(h)}</p>
+        <p style="color:red">🔥 ${getLiveView()}人正在看</p>
+        <p style="color:green">${getFakeDeal()}</p>
+
+        <p>👀 ${h.viewCount} | 💬 ${h.inquiryCount}</p>
+
+        <p style="color:orange">⏳ 剩 ${getCountdown(h)} 天</p>
+
+        <button onclick="event.stopPropagation(); goLine(${h.id})">
+          💬 立即詢問
+        </button>
+
+        <button onclick="event.stopPropagation(); buyTop(${h.id})">
+          🔥 置頂曝光 +300%（$29）
+        </button>
+
+      </div>
+    </div>
+    `
+  })
+
+  document.getElementById("list").innerHTML = html
+}
+
+// ======================
+render()
+
+</script>
+
+</body>
+</html>
